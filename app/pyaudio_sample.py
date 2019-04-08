@@ -1,6 +1,7 @@
 import pyaudio
 import wave
 import sys
+import time
 
 CHUNK = 1024
 
@@ -24,6 +25,8 @@ while data != '':
     stream.write(data)
     data = wf.readframes(CHUNK)
     c += 1
+    time.sleep(0.02)
+    # 1024/44000は0.023ぐらいなのでこれでnonblockingに再生できることが確認できる
     if c % 40 == 0:
         print("hoge")
 
