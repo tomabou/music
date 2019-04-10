@@ -10,11 +10,13 @@
 上記を組み合わせれば完成である
 
 ## ライブラリ選定
+
 音声IO: PyAudioがいいんじゃなかろうかと感じる
 
 PyAudioを使ってバッキングの音声ファイルは出力できそう
 
 メロディーはどうやって出力するのか
+
 1. MIDIで外部機器
 2. 直接wavを再生
 3. MIDIでVSTi
@@ -44,7 +46,7 @@ windowsにSDKを入れてちゃんと動作することを確認
 ubuntuで動くかあとで確認する
 
 ubuntuでv2.3.1のapiが動くことを確認した
-https://futurismo.biz/archives/6655/
+<https://futurismo.biz/archives/6655/>
 このサイトにはインストールがfailすると書いてあったが、特にエラーを吐かずにインストール出来た
 Visualizerは結構不安定
 v2.3.1を動かして思ったがかなり不安定である
