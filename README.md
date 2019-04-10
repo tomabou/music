@@ -49,3 +49,6 @@ https://futurismo.biz/archives/6655/
 Visualizerは結構不安定
 v2.3.1を動かして思ったがかなり不安定である
 windows上で動くV4のほうがかなりトラッキングの精度が高いと感じた。Midiとの相性もあるのでwindowsで開発したほうが丸いかもしれない
+
+windows上で環境構築するのが面倒かと一瞬思ったが、scoopという神ツールの存在を知ったので一気にやる気になった
+今回はwindows上で頑張ることにする
