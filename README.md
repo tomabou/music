@@ -54,3 +54,7 @@ windows上で動くV4のほうがかなりトラッキングの精度が高い�
 
 windows上で環境構築するのが面倒かと一瞬思ったが、scoopという神ツールの存在を知ったので一気にやる気になった
 今回はwindows上で頑張ることにする
+windows上でpyaudioを動かした　python3.7はだめでpython3.6でないとダメだった
+v4はc api があるのだがかなり低級なもので、高級なapiはどうやらunityとunrial engine用のものしか作られてないらしい
+python bindingがあるのはv3なのでv3を使ってみることにする
+誰かpython binding書いてくれないのかなぁ
