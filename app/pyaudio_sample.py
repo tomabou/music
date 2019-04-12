@@ -9,6 +9,7 @@ if len(sys.argv) < 2:
     print("Plays a wave file.\n\nUsage: %s filename.wav" % sys.argv[0])
     sys.exit(-1)
 
+
 wf = wave.open(sys.argv[1], 'rb')
 
 p = pyaudio.PyAudio()
@@ -29,7 +30,6 @@ while data != '':
     # 1024/44000は0.023ぐらいなのでこれでnonblockingに再生できることが確認できる
     if c % 40 == 0:
         print("hoge")
-
 
 stream.stop_stream()
 stream.close()
