@@ -22,11 +22,21 @@ stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
 
 data = wf.readframes(CHUNK)
 
+c = 0
 while True:
+
+    x = time.time()
     stream.write(data)
+    y = time.time()
     data = wf.readframes(CHUNK)
-    time.sleep(0.02)
+    z = time.time()
     # 1024/44000は0.023ぐらいなのでこれでnonblockingに再生できることが確認できる
+    c += 1
+    if c % 40 == 0:
+        print("hoge")
+        print(x-y)
+        print(y-z)
+
     if data == b'':
         wf.rewind()
         data = wf.readframes(CHUNK)
