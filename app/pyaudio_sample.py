@@ -30,7 +30,6 @@ while True:
     y = time.time()
     data = wf.readframes(CHUNK)
     z = time.time()
-    # 1024/44000は0.023ぐらいなのでこれでnonblockingに再生できることが確認できる
     c += 1
     if c % 40 == 0:
         print("hoge")
