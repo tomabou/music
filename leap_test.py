@@ -29,8 +29,8 @@ class SampleListener(Leap.Listener):
     finger_names = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky']
     bone_names = ['Metacarpal', 'Proximal', 'Intermediate', 'Distal']
 
-    pre_y_speed = 1
-    pre_note = 60
+    pre_y_speed = [1, 2]
+    pre_note = [60, 60]
 
     def on_init(self, controller):
         print "Initialized"
@@ -52,32 +52,48 @@ class SampleListener(Leap.Listener):
         print "Frame id: %d, timestamp: %d, hands: %d, fingers: %d" % (
               frame.id, frame.timestamp, len(frame.hands), len(frame.fingers))
 
+        isDead = [True, True]
         # Get hands
         for hand in frame.hands:
 
-            handType = "Left hand" if hand.is_left else "Right hand"
+            handType = 0 if hand.is_left else 1
+            isDead[handType] = False
 
             y_speed = hand.palm_velocity[1]
             x_pos = hand.palm_position[0]
             print " %d " % (x_pos)
 
-            note = 60 + (int(x_pos) // 10)
+            note = 60 + nearest_note(int(x_pos) // 20)
 
-            if self.pre_y_speed > 0 and y_speed < 0:
+            if self.pre_y_speed[handType] > -50 and y_speed <= -50:
                 player.note_on(note, 127)
-                self.pre_note = note
+                if self.pre_note[handType] != None and note != self.pre_note[handType]:
+                    player.note_off(self.pre_note[handType], 127)
+                self.pre_note[handType] = note
                 print "note on"
-            if self.pre_y_speed < 0 and y_speed > 0:
-                player.note_off(self.pre_note, 127)
+            if self.pre_y_speed[handType] < 0 and y_speed > 0:
                 print "note off"
 
-            self.pre_y_speed = y_speed
+            self.pre_y_speed[handType] = y_speed
 
             print "  %s, id %d, velocity: %s" % (
                 handType, hand.id, hand.palm_velocity)
 
+        print isDead
+        for i, state in enumerate(isDead):
+            if state:
+                if self.pre_note[i]:
+                    player.note_off(self.pre_note[i], 127)
+                self.pre_note[i] = None
+
         if not frame.hands.is_empty:
             print ""
+
+
+def nearest_note(x):
+    for i in range(3):
+        if (x+i) % 12 in [0, 2, 4,  7, 9]:
+            return (x + i)
 
 
 def main():
