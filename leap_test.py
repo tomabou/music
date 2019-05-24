@@ -30,6 +30,7 @@ class SampleListener(Leap.Listener):
     bone_names = ['Metacarpal', 'Proximal', 'Intermediate', 'Distal']
 
     pre_y_speed = 1
+    pre_note = 60
 
     def on_init(self, controller):
         print "Initialized"
@@ -57,13 +58,17 @@ class SampleListener(Leap.Listener):
             handType = "Left hand" if hand.is_left else "Right hand"
 
             y_speed = hand.palm_velocity[1]
-            print " %d %d " % (self.pre_y_speed, y_speed)
+            x_pos = hand.palm_position[0]
+            print " %d " % (x_pos)
+
+            note = 60 + (int(x_pos) // 10)
 
             if self.pre_y_speed > 0 and y_speed < 0:
-                player.note_on(64, 127)
+                player.note_on(note, 127)
+                self.pre_note = note
                 print "note on"
             if self.pre_y_speed < 0 and y_speed > 0:
-                player.note_off(64, 127)
+                player.note_off(self.pre_note, 127)
                 print "note off"
 
             self.pre_y_speed = y_speed
