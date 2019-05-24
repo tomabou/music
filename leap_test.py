@@ -15,8 +15,8 @@ print("get_default_output_id:%d" % pygame.midi.get_default_output_id())
 print("No:(interf, name, input, output, opened)")
 for i in range(count):
     print("%d:%s" % (i, pygame.midi.get_device_info(i)))
-player = pygame.midi.Output(6)
-player.set_instrument(0)
+player = pygame.midi.Output(4)
+player.set_instrument(1)
 
 
 def playnote(note):
@@ -49,8 +49,8 @@ class SampleListener(Leap.Listener):
         # Get the most recent frame and report some basic information
         frame = controller.frame()
 
-        print "Frame id: %d, timestamp: %d, hands: %d, fingers: %d" % (
-              frame.id, frame.timestamp, len(frame.hands), len(frame.fingers))
+        # print "Frame id: %d, timestamp: %d, hands: %d, fingers: %d" % (
+        #     frame.id, frame.timestamp, len(frame.hands), len(frame.fingers))
 
         isDead = [True, True]
         # Get hands
@@ -61,33 +61,28 @@ class SampleListener(Leap.Listener):
 
             y_speed = hand.palm_velocity[1]
             x_pos = hand.palm_position[0]
-            print " %d " % (x_pos)
+            #print " %d " % (x_pos)
 
-            note = 60 + nearest_note(int(x_pos) // 20)
+            note = 72 + nearest_note(int(x_pos) // 20)
 
-            if self.pre_y_speed[handType] > -50 and y_speed <= -50:
-                player.note_on(note, 127)
-                if self.pre_note[handType] != None and note != self.pre_note[handType]:
+            if self.pre_y_speed[handType] > -200 and y_speed <= -200:
+                if self.pre_note[handType] != None:
                     player.note_off(self.pre_note[handType], 127)
+                player.note_on(note, 127)
                 self.pre_note[handType] = note
-                print "note on"
-            if self.pre_y_speed[handType] < 0 and y_speed > 0:
-                print "note off"
+                print "note on %d " % y_speed
 
             self.pre_y_speed[handType] = y_speed
 
-            print "  %s, id %d, velocity: %s" % (
-                handType, hand.id, hand.palm_velocity)
+            print y_speed
+            # print "  %s, id %d, velocity: %s" % (
+            #    handType, hand.id, hand.palm_velocity)
 
-        print isDead
         for i, state in enumerate(isDead):
             if state:
                 if self.pre_note[i]:
                     player.note_off(self.pre_note[i], 127)
                 self.pre_note[i] = None
-
-        if not frame.hands.is_empty:
-            print ""
 
 
 def nearest_note(x):
