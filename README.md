@@ -58,3 +58,6 @@ windows上でpyaudioを動かした　python3.7はだめでpython3.6でないと
 v4はc api があるのだがかなり低級なもので、高級なapiはどうやらunityとunrial engine用のものしか作られてないらしい
 python bindingがあるのはv3なのでv3を使ってみることにする
 誰かpython binding書いてくれないのかなぁ
+
+
+frame 30fps
