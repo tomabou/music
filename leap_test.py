@@ -75,7 +75,6 @@ class SampleListener(Leap.Listener):
                 self.pre_note[handType] = note
                 end = time.time()
                 print(note)
-                print("time is {} ".format(end-start))
 
             self.pre_y_speed[handType] = y_speed
 
@@ -102,8 +101,8 @@ def main():
     # Have the sample listener receive events from the controller
     controller.add_listener(listener)
 
-    #t1 = threading.Thread(target=play_music)
-    # t1.start()
+    t1 = threading.Thread(target=play_music)
+    t1.start()
     # Keep this process running until Enter is pressed
     print "Press Enter to quit..."
     try:
