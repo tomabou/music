@@ -5,6 +5,7 @@ import time
 from lib.MusicData import SONGS, Chord
 import lib.Flags as Flags
 import math
+import lib.Flags as Flags
 
 
 CHORD = Chord('D', 0)
@@ -58,7 +59,6 @@ def play_music():
         song_ratio = now_frame/float(frame_lengths[now_song])
 
         set_global_chord(now_song, song_ratio)
-        print(CHORD)
         if data == b'':
             now_song = SONG_NUM
             wfs[now_song].rewind()

@@ -7,7 +7,8 @@ from concurrent.futures import ThreadPoolExecutor
 import threading
 import lib.Flags as Flags
 from lib.NoteGenerator import NoteGenerator
-from lib.MusicPlayer import play_music, CHORD
+from lib.MusicPlayer import play_music
+import lib.MusicPlayer
 
 
 midiout = rtmidi.MidiOut()
@@ -113,8 +114,10 @@ def main():
 def test_midi():
     note_generator = NoteGenerator(60, 90)
     while not Flags.FINISH:
-        note_generator.set_chord(CHORD)
+        note_generator.set_chord(lib.MusicPlayer.CHORD)
         n = note_generator.create_tone_note(random.random())
+        print(lib.MusicPlayer.CHORD)
+        print(n)
         playnote(n)
 
 
@@ -135,7 +138,6 @@ def test():
         # Remove the sample listener when done
         # all note off
         Flags.FINISH = True
-        midiout.send_message([0xB0, 123, 0])
 
 
 if __name__ == "__main__":
