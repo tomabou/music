@@ -5,6 +5,7 @@ import random
 import rtmidi
 from concurrent.futures import ThreadPoolExecutor
 import threading
+import lib.Flags as Flags
 from lib.NoteGenerator import NoteGenerator
 from lib.MusicPlayer import play_music, CHORD
 
@@ -112,6 +113,8 @@ def main():
 def test_midi():
     note_generator = NoteGenerator(60, 90)
     for i in range(16):
+        if Flags.FINISH:
+            return
         n = note_generator.create_tone_note(random.random())
         playnote(n)
 
@@ -123,6 +126,17 @@ def test():
     time.sleep(1)
     t1.start()
     t2.start()
+
+    print "Press Enter to quit..."
+    try:
+        sys.stdin.readline()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        # Remove the sample listener when done
+        # all note off
+        Flags.FINISH = True
+        midiout.send_message([0xB0, 123, 0])
 
 
 if __name__ == "__main__":

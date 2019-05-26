@@ -3,6 +3,7 @@ import wave
 import sys
 import time
 from lib.MusicData import SONGS, Chord
+import lib.Flags as Flags
 import math
 
 
@@ -50,7 +51,7 @@ def play_music():
     data = wfs[now_song].readframes(CHUNK)
 
     now_frame = 0
-    while True:
+    while not Flags.FINISH:
         stream.write(data)  # blocking
         now_frame += CHUNK
         data = wfs[now_song].readframes(CHUNK)
