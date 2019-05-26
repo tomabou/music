@@ -112,9 +112,8 @@ def main():
 
 def test_midi():
     note_generator = NoteGenerator(60, 90)
-    for i in range(16):
-        if Flags.FINISH:
-            return
+    while not Flags.FINISH:
+        note_generator.set_chord(CHORD)
         n = note_generator.create_tone_note(random.random())
         playnote(n)
 
