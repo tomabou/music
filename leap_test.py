@@ -3,6 +3,8 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
 import rtmidi
+from lib.NoteGenerator import NoteGenerator
+import random
 
 
 midiout = rtmidi.MidiOut()
@@ -105,5 +107,15 @@ def main():
         controller.remove_listener(listener)
 
 
+def test():
+    note_generator = NoteGenerator(60, 90)
+    for i in range(16):
+        n = note_generator.create_tone_note(random.random())
+        playnote(n)
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1 and sys.argv[1] == 'test':
+        test()
+    else:
+        main()
