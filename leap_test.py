@@ -17,6 +17,8 @@ print available_ports
 use_midi_port_num = int(raw_input())
 midiout.open_port(use_midi_port_num)
 
+note_generator = NoteGenerator(60, 90)
+
 
 def note_on(channel, pitch, velo):
     return [0x90+channel, pitch, velo]
@@ -59,21 +61,23 @@ class SampleListener(Leap.Listener):
             isDead[handType] = False
 
             y_speed = hand.palm_velocity[1]
-            x_pos = hand.palm_position[0]
-
-            note = 72 + nearest_note(int(x_pos) // 20)
+            x_pos = (hand.palm_position[0] + 200.0)/400.0
 
             if self.pre_y_speed[handType] > -200 and y_speed <= -200:
                 if self.pre_note[handType] != None:
                     midiout.send_message(
                         note_off(0, self.pre_note[handType]))
+
+                start = time.time()
+                note_generator.set_chord(lib.MusicPlayer.CHORD)
+                note = note_generator.create_tone_note(x_pos)
                 midiout.send_message(note_on(0, note, 64))
                 self.pre_note[handType] = note
-                print "note on %d " % y_speed
+                end = time.time()
+                print(note)
+                print("time is {} ".format(end-start))
 
             self.pre_y_speed[handType] = y_speed
-
-            print y_speed
 
         for i, state in enumerate(isDead):
             if state:
@@ -98,6 +102,8 @@ def main():
     # Have the sample listener receive events from the controller
     controller.add_listener(listener)
 
+    #t1 = threading.Thread(target=play_music)
+    # t1.start()
     # Keep this process running until Enter is pressed
     print "Press Enter to quit..."
     try:
@@ -107,15 +113,16 @@ def main():
     finally:
         # Remove the sample listener when done
         # all note off
+        Flags.FINISH = True
         midiout.send_message([0xB0, 123, 0])
         controller.remove_listener(listener)
 
 
 def test_midi():
-    note_generator = NoteGenerator(60, 90)
     while not Flags.FINISH:
         note_generator.set_chord(lib.MusicPlayer.CHORD)
         n = note_generator.create_tone_note(random.random())
+        print(note_generator.tone_note_list())
         print(lib.MusicPlayer.CHORD)
         print(n)
         playnote(n)
@@ -138,6 +145,7 @@ def test():
         # Remove the sample listener when done
         # all note off
         Flags.FINISH = True
+        midiout.send_message([0xB0, 123, 0])
 
 
 if __name__ == "__main__":

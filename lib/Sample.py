@@ -6,7 +6,10 @@
 # between Leap Motion and you, your company or other organization.             #
 ################################################################################
 
-import Leap, sys, thread, time
+import Leap
+import sys
+import thread
+import time
 
 
 class SampleListener(Leap.Listener):
@@ -40,6 +43,8 @@ class SampleListener(Leap.Listener):
 
             print "  %s, id %d, position: %s" % (
                 handType, hand.id, hand.palm_position)
+
+            continue
 
             # Get the hand's normal vector and direction
             normal = hand.palm_normal
@@ -78,6 +83,7 @@ class SampleListener(Leap.Listener):
 
         if not frame.hands.is_empty:
             print ""
+
 
 def main():
     # Create a sample listener and controller

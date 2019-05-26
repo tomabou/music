@@ -26,7 +26,7 @@ class NoteGenerator(object):
     def tone_note_list(self):
         note = []
         for n in self.quality2note[self.chord.quality]:
-            note.append((n+self.chord.root - self.chord.function) % 12)
+            note.append((n+self.chord.root) % 12)
 
         note.sort()
         return note
