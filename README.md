@@ -61,3 +61,5 @@ python bindingがあるのはv3なのでv3を使ってみることにする
 
 
 frame 30fps
+
+BPM 125

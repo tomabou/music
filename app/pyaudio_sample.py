@@ -25,8 +25,9 @@ data = wf.readframes(CHUNK)
 c = 0
 while True:
 
+    time.sleep(0.015)
     x = time.time()
-    stream.write(data)
+    stream.write(data)  # blocking
     y = time.time()
     data = wf.readframes(CHUNK)
     z = time.time()

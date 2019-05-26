@@ -1,34 +1,32 @@
-
 import lib.Leap as Leap
 import sys
-import thread
 import time
+from concurrent.futures import ThreadPoolExecutor
+import rtmidi
 
-import pygame.midi
-import pygame
 
-pygame.init()
-pygame.midi.init()
-count = pygame.midi.get_count()
-print("get_default_input_id:%d" % pygame.midi.get_default_input_id())
-print("get_default_output_id:%d" % pygame.midi.get_default_output_id())
-print("No:(interf, name, input, output, opened)")
-for i in range(count):
-    print("%d:%s" % (i, pygame.midi.get_device_info(i)))
-player = pygame.midi.Output(4)
-player.set_instrument(1)
+midiout = rtmidi.MidiOut()
+available_ports = midiout.get_ports()
+print available_ports
+use_midi_port_num = int(raw_input())
+midiout.open_port(use_midi_port_num)
+
+
+def note_on(channel, pitch, velo):
+    return [0x90+channel, pitch, velo]
+
+
+def note_off(channel, pitch):
+    return [0x80+channel, pitch, 0]
 
 
 def playnote(note):
-    player.note_on(note, 127)
+    midiout.send_message(note_on(0, note, 112))
     time.sleep(0.5)
-    player.note_off(note, 127)
+    midiout.send_message(note_off(0, note))
 
 
 class SampleListener(Leap.Listener):
-    finger_names = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky']
-    bone_names = ['Metacarpal', 'Proximal', 'Intermediate', 'Distal']
-
     pre_y_speed = [1, 2]
     pre_note = [60, 60]
 
@@ -39,7 +37,6 @@ class SampleListener(Leap.Listener):
         print "Connected"
 
     def on_disconnect(self, controller):
-        # Note: not dispatched when running in a debugger.
         print "Disconnected"
 
     def on_exit(self, controller):
@@ -49,11 +46,7 @@ class SampleListener(Leap.Listener):
         # Get the most recent frame and report some basic information
         frame = controller.frame()
 
-        # print "Frame id: %d, timestamp: %d, hands: %d, fingers: %d" % (
-        #     frame.id, frame.timestamp, len(frame.hands), len(frame.fingers))
-
         isDead = [True, True]
-        # Get hands
         for hand in frame.hands:
 
             handType = 0 if hand.is_left else 1
@@ -61,27 +54,26 @@ class SampleListener(Leap.Listener):
 
             y_speed = hand.palm_velocity[1]
             x_pos = hand.palm_position[0]
-            #print " %d " % (x_pos)
 
             note = 72 + nearest_note(int(x_pos) // 20)
 
             if self.pre_y_speed[handType] > -200 and y_speed <= -200:
                 if self.pre_note[handType] != None:
-                    player.note_off(self.pre_note[handType], 127)
-                player.note_on(note, 127)
+                    midiout.send_message(
+                        note_off(0, self.pre_note[handType]))
+                midiout.send_message(note_on(0, note, 127))
                 self.pre_note[handType] = note
                 print "note on %d " % y_speed
 
             self.pre_y_speed[handType] = y_speed
 
             print y_speed
-            # print "  %s, id %d, velocity: %s" % (
-            #    handType, hand.id, hand.palm_velocity)
 
         for i, state in enumerate(isDead):
             if state:
                 if self.pre_note[i]:
-                    player.note_off(self.pre_note[i], 127)
+                    midiout.send_message(
+                        note_off(0, self.pre_note[i]))
                 self.pre_note[i] = None
 
 
@@ -92,7 +84,8 @@ def nearest_note(x):
 
 
 def main():
-    # Create a sample listener and controller
+    playnote(60)
+
     listener = SampleListener()
     controller = Leap.Controller()
 
@@ -112,5 +105,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    del player
-    pygame.midi.quit()
