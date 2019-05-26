@@ -37,6 +37,7 @@ def playnote(note):
 class SampleListener(Leap.Listener):
     pre_y_speed = [1, 2]
     pre_note = [60, 60]
+    note_lock = [0, 0]
 
     def on_init(self, controller):
         print "Initialized"
@@ -62,16 +63,22 @@ class SampleListener(Leap.Listener):
 
             y_speed = hand.palm_velocity[1]
             x_pos = (hand.palm_position[0] + 200.0)/400.0
+            velo = min(127, int(hand.palm_position[1] * 0.18))
 
-            if self.pre_y_speed[handType] > -200 and y_speed <= -200:
+            if self.note_lock[handType] > 0:
+                self.note_lock[handType] -= 1
+
+            if self.pre_y_speed[handType] > -200\
+                    and y_speed <= -200 and self.note_lock[handType] == 0:
                 if self.pre_note[handType] != None:
                     midiout.send_message(
-                        note_off(0, self.pre_note[handType]))
+                        note_off(handType, self.pre_note[handType]))
 
                 start = time.time()
                 note_generator.set_chord(lib.MusicPlayer.CHORD)
                 note = note_generator.create_tone_note(x_pos)
-                midiout.send_message(note_on(0, note, 64))
+                midiout.send_message(note_on(handType, note, velo))
+                self.note_lock[handType] = 3
                 self.pre_note[handType] = note
                 end = time.time()
                 print(note)
@@ -82,7 +89,7 @@ class SampleListener(Leap.Listener):
             if state:
                 if self.pre_note[i]:
                     midiout.send_message(
-                        note_off(0, self.pre_note[i]))
+                        note_off(i, self.pre_note[i]))
                 self.pre_note[i] = None
 
 
