@@ -17,7 +17,7 @@ def note_on(channel, pitch, velo):
 
 
 def note_off(channel, pitch):
-    return [0x80+channel, pitch, 0]
+    return [0x80+channel, pitch, 64]
 
 
 def playnote(note):
@@ -61,7 +61,7 @@ class SampleListener(Leap.Listener):
                 if self.pre_note[handType] != None:
                     midiout.send_message(
                         note_off(0, self.pre_note[handType]))
-                midiout.send_message(note_on(0, note, 127))
+                midiout.send_message(note_on(0, note, 64))
                 self.pre_note[handType] = note
                 print "note on %d " % y_speed
 
@@ -100,6 +100,8 @@ def main():
         pass
     finally:
         # Remove the sample listener when done
+        # all note off
+        midiout.send_message([0xB0, 123, 0])
         controller.remove_listener(listener)
 
 
