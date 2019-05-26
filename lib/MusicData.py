@@ -9,12 +9,15 @@ class Chord(object):
         '7',
         'm7',
         'M7',
-        'mM7'
+        'mM7',
+        'dim',
     ]
     root_list = ['C', 'C#', 'D', 'D#', 'E',
                  'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+    func_list = ['1', '1#', '2', '2#', '3',
+                 '4', '4#', '5', '5#', '6', '6#', '7']
 
-    def __init__(self, root, quality):
+    def __init__(self, root, quality, func=None):
         if type(root) == IntType:
             self.root = root
         else:
@@ -25,8 +28,20 @@ class Chord(object):
         else:
             self.quality = self.quality_list.index(quality)
 
+        if func:
+            self.function = func
+        else:
+            self.function = self.root
+
     def __str__(self):
-        return self.root_list[self.root] + self.quality_list[self.quality]
+        q = self.quality_list[self.quality]
+        return self.root_list[self.root] + q + " " + self.func_list[self.function] + q
+
+    def __eq__(self, other):
+        return self.root == other.root and self.quality == other.quality
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 
 SONGS = [[

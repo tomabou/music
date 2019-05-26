@@ -23,7 +23,9 @@ def get_chord(song_num, song_ratio):
 def set_global_chord(song_num, song_ratio):
     c = get_chord(song_num, song_ratio)
     global CHORD
-    CHORD = c
+    if CHORD != c:
+        CHORD = c
+        print("set chord")
 
 
 def get_filepath(i):
