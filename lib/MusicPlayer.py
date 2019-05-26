@@ -32,7 +32,7 @@ def get_filepath(i):
     return "./files/song"+str(i)+".wav"
 
 
-def play():
+def play_music():
     wfs = []
     frame_lengths = []
     now_song = SONG_NUM

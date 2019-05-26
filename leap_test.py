@@ -1,10 +1,12 @@
 import lib.Leap as Leap
 import sys
 import time
-from concurrent.futures import ThreadPoolExecutor
-import rtmidi
-from lib.NoteGenerator import NoteGenerator
 import random
+import rtmidi
+from concurrent.futures import ThreadPoolExecutor
+import threading
+from lib.NoteGenerator import NoteGenerator
+from lib.MusicPlayer import play_music, CHORD
 
 
 midiout = rtmidi.MidiOut()
@@ -107,11 +109,20 @@ def main():
         controller.remove_listener(listener)
 
 
-def test():
+def test_midi():
     note_generator = NoteGenerator(60, 90)
     for i in range(16):
         n = note_generator.create_tone_note(random.random())
         playnote(n)
+
+
+def test():
+    t1 = threading.Thread(target=test_midi)
+    t2 = threading.Thread(target=play_music)
+    print("thread created")
+    time.sleep(1)
+    t1.start()
+    t2.start()
 
 
 if __name__ == "__main__":
