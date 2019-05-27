@@ -35,12 +35,14 @@ def playnote(note):
 
 
 class SampleListener(Leap.Listener):
-    pre_y_speed = [1, 2, 1, 1]
-    pre_note = [60, 60, 60, 60]
-    note_lock = [0, 0]
 
     def on_init(self, controller):
         print "Initialized"
+        self.pre_y_speed = [0 for i in range(101)]
+        self.pre_tip_y_speed = [0 for i in range(101)]
+
+        self.pre_note = [60, 60]
+        self.note_lock = [0, 0]
 
     def on_connect(self, controller):
         print "Connected"
@@ -52,6 +54,8 @@ class SampleListener(Leap.Listener):
         print "Exited"
 
     def send_note_midi(self, note_num, handType, velo):
+        if self.note_lock[handType] > 0:
+            return
         if self.pre_note[handType] != None:
             midiout.send_message(
                 note_off(handType, self.pre_note[handType]))
@@ -60,8 +64,21 @@ class SampleListener(Leap.Listener):
         self.pre_note[handType] = note_num
         print(note_num)
 
-    def finger_func(self, finger):
+    def finger_func(self, finger, handType):
         tip_y_speed = finger.tip_velocity[1]
+        tip_x_pos = (finger.tip_position[0] + 200.0)/400.0
+        velo = min(127, int(finger.tip_position[1] * 0.18))
+        finger_id = finger.id % 100
+
+        if self.pre_tip_y_speed[finger_id] > -400\
+                and tip_y_speed <= -400:
+
+            #print("finger in")
+            note_generator.set_chord(lib.MusicPlayer.CHORD)
+            note = note_generator.create_available_note(tip_x_pos)
+            #self.send_note_midi(note, handType, velo)
+
+        self.pre_tip_y_speed[finger_id] = tip_y_speed
 
     def hand_func(self, hand):
         handType = 0 if hand.is_left else 1
@@ -69,23 +86,24 @@ class SampleListener(Leap.Listener):
         y_speed = hand.palm_velocity[1]
         x_pos = (hand.palm_position[0] + 200.0)/400.0
         velo = min(127, int(hand.palm_position[1] * 0.18))
+        hand_id = hand.id % 100
 
         # avoid noise
         if self.note_lock[handType] > 0:
             self.note_lock[handType] -= 1
 
-        if self.pre_y_speed[handType] > -200\
-                and y_speed <= -200 and self.note_lock[handType] == 0:
+        if self.pre_y_speed[hand_id] > -200\
+                and y_speed <= -200:
 
             note_generator.set_chord(lib.MusicPlayer.CHORD)
             note = note_generator.create_tone_note(x_pos)
             self.send_note_midi(note, handType, velo)
 
-        self.pre_y_speed[handType] = y_speed
+        self.pre_y_speed[hand_id] = y_speed
 
-        if abs(y_speed) > 200:
+        if abs(y_speed) < 200:
             for finger in hand.fingers:
-                self.finger_func(finger)
+                self.finger_func(finger, handType)
 
         return handType
 
