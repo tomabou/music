@@ -51,39 +51,47 @@ class SampleListener(Leap.Listener):
     def on_exit(self, controller):
         print "Exited"
 
+    def hand_func(self, hand):
+        handType = 0 if hand.is_left else 1
+
+        y_speed = hand.palm_velocity[1]
+        x_pos = (hand.palm_position[0] + 200.0)/400.0
+        velo = min(127, int(hand.palm_position[1] * 0.18))
+
+        # avoid noise
+        if self.note_lock[handType] > 0:
+            self.note_lock[handType] -= 1
+
+        if self.pre_y_speed[handType] > -200\
+                and y_speed <= -200 and self.note_lock[handType] == 0:
+            if self.pre_note[handType] != None:
+                midiout.send_message(
+                    note_off(handType, self.pre_note[handType]))
+
+            note_generator.set_chord(lib.MusicPlayer.CHORD)
+            note = note_generator.create_tone_note(x_pos)
+            midiout.send_message(note_on(handType, note, velo))
+            self.note_lock[handType] = 3
+            self.pre_note[handType] = note
+            print(note)
+
+        self.pre_y_speed[handType] = y_speed
+
+        for finger in hand.fingers:
+            if abs(y_speed) > 200:
+                continue
+            tip_y_speed = finger.tip_velocity[1]
+
+        return handType
+
     def on_frame(self, controller):
         # Get the most recent frame and report some basic information
         frame = controller.frame()
 
         isDead = [True, True]
         for hand in frame.hands:
-
-            handType = 0 if hand.is_left else 1
+            handType = self.hand_func(hand)
             isDead[handType] = False
-
-            y_speed = hand.palm_velocity[1]
-            x_pos = (hand.palm_position[0] + 200.0)/400.0
-            velo = min(127, int(hand.palm_position[1] * 0.18))
-
-            if self.note_lock[handType] > 0:
-                self.note_lock[handType] -= 1
-
-            if self.pre_y_speed[handType] > -200\
-                    and y_speed <= -200 and self.note_lock[handType] == 0:
-                if self.pre_note[handType] != None:
-                    midiout.send_message(
-                        note_off(handType, self.pre_note[handType]))
-
-                start = time.time()
-                note_generator.set_chord(lib.MusicPlayer.CHORD)
-                note = note_generator.create_tone_note(x_pos)
-                midiout.send_message(note_on(handType, note, velo))
-                self.note_lock[handType] = 3
-                self.pre_note[handType] = note
-                end = time.time()
-                print(note)
-
-            self.pre_y_speed[handType] = y_speed
 
         for i, state in enumerate(isDead):
             if state:
