@@ -36,7 +36,7 @@ def playnote(note):
 class SampleListener(Leap.Listener):
 
     def on_init(self, controller):
-        print "Initialized"
+        print("Initialized")
         self.pre_y_speed = [0 for i in range(101)]
         self.pre_tip_y_speed = [0 for i in range(101)]
 
@@ -44,13 +44,13 @@ class SampleListener(Leap.Listener):
         self.note_lock = [0, 0]
 
     def on_connect(self, controller):
-        print "Connected"
+        print("Connected")
 
     def on_disconnect(self, controller):
-        print "Disconnected"
+        print("Disconnected")
 
     def on_exit(self, controller):
-        print "Exited"
+        print("Exited")
 
     def send_note_midi(self, note_num, handType, velo):
         if self.note_lock[handType] > 0:
@@ -123,12 +123,6 @@ class SampleListener(Leap.Listener):
                 self.pre_note[i] = None
 
 
-def nearest_note(x):
-    for i in range(3):
-        if (x + i) % 12 in [0, 2, 4, 7, 9]:
-            return (x + i)
-
-
 def main():
     playnote(60)
 
@@ -141,16 +135,16 @@ def main():
     t1 = threading.Thread(target=play_music)
     t1.start()
     # Keep this process running until Enter is pressed
-    print "Press Enter to quit..."
+    print("Press Enter to quit...")
     try:
         sys.stdin.readline()
     except KeyboardInterrupt:
         pass
     finally:
-        # Remove the sample listener when done
         # all note off
         Flags.FINISH = True
         midiout.send_message([0xB0, 123, 0])
+        # Remove the sample listener when done
         controller.remove_listener(listener)
 
 
@@ -178,9 +172,8 @@ def test():
     except KeyboardInterrupt:
         pass
     finally:
-        # Remove the sample listener when done
-        # all note off
         Flags.FINISH = True
+        # all note off
         midiout.send_message([0xB0, 123, 0])
 
 
