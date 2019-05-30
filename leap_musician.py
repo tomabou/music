@@ -3,7 +3,6 @@ import sys
 import time
 import random
 import rtmidi
-from concurrent.futures import ThreadPoolExecutor
 import threading
 import lib.Flags as Flags
 from lib.NoteGenerator import NoteGenerator
@@ -13,7 +12,7 @@ import lib.MusicPlayer
 
 midiout = rtmidi.MidiOut()
 available_ports = midiout.get_ports()
-print available_ports
+print(available_ports)
 use_midi_port_num = int(raw_input())
 midiout.open_port(use_midi_port_num)
 
@@ -21,11 +20,11 @@ note_generator = NoteGenerator(60, 90)
 
 
 def note_on(channel, pitch, velo):
-    return [0x90+channel, pitch, velo]
+    return [0x90 + channel, pitch, velo]
 
 
 def note_off(channel, pitch):
-    return [0x80+channel, pitch, 64]
+    return [0x80 + channel, pitch, 64]
 
 
 def playnote(note):
@@ -41,7 +40,7 @@ class SampleListener(Leap.Listener):
         self.pre_y_speed = [0 for i in range(101)]
         self.pre_tip_y_speed = [0 for i in range(101)]
 
-        self.pre_note = [60, 60]
+        self.pre_note = [None, None]
         self.note_lock = [0, 0]
 
     def on_connect(self, controller):
@@ -56,17 +55,17 @@ class SampleListener(Leap.Listener):
     def send_note_midi(self, note_num, handType, velo):
         if self.note_lock[handType] > 0:
             return
-        if self.pre_note[handType] != None:
+        if self.pre_note[handType] is not None:
             midiout.send_message(
                 note_off(handType, self.pre_note[handType]))
         midiout.send_message(note_on(handType, note_num, velo))
         self.note_lock[handType] = 3
         self.pre_note[handType] = note_num
-        print(note_num)
+        print("not:{} velo:{}".format(note_num, velo))
 
     def finger_func(self, finger, handType):
         tip_y_speed = finger.tip_velocity[1]
-        tip_x_pos = (finger.tip_position[0] + 200.0)/400.0
+        tip_x_pos = (finger.tip_position[0] + 200.0) / 400.0
         velo = min(127, int(finger.tip_position[1] * 0.18))
         finger_id = finger.id % 100
 
@@ -84,7 +83,7 @@ class SampleListener(Leap.Listener):
         handType = 0 if hand.is_left else 1
 
         y_speed = hand.palm_velocity[1]
-        x_pos = (hand.palm_position[0] + 200.0)/400.0
+        x_pos = (hand.palm_position[0] + 200.0) / 400.0
         velo = min(127, int(hand.palm_position[1] * 0.18))
         hand_id = hand.id % 100
 
@@ -96,7 +95,6 @@ class SampleListener(Leap.Listener):
                 and y_speed <= -200:
 
             note_generator.set_chord(lib.MusicPlayer.CHORD)
-            #note = note_generator.create_tone_note(x_pos)
             note = note_generator.create_note_mix(x_pos, 0.5)
             self.send_note_midi(note, handType, velo)
 
@@ -127,7 +125,7 @@ class SampleListener(Leap.Listener):
 
 def nearest_note(x):
     for i in range(3):
-        if (x+i) % 12 in [0, 2, 4,  7, 9]:
+        if (x + i) % 12 in [0, 2, 4, 7, 9]:
             return (x + i)
 
 

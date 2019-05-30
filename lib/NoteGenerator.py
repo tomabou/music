@@ -26,7 +26,7 @@ class NoteGenerator(object):
     def tone_note_list(self):
         note = []
         for n in self.quality2note[self.chord.quality]:
-            note.append((n+self.chord.root) % 12)
+            note.append((n + self.chord.root) % 12)
 
         note.sort()
         return note
@@ -34,7 +34,7 @@ class NoteGenerator(object):
     def avoid_note_list(self):
         note = []
         for n in self.tone_note_list():
-            note.append((n+1) % 12)
+            note.append((n + 1) % 12)
         note.sort()
         return note
 
@@ -69,7 +69,7 @@ class NoteGenerator(object):
         position = (self.max_note - self.min_note) * val + self.min_note
         position /= 12.0
         oc = int(position)
-        note = oc * 12 + notes[int((position-oc)*l)]
+        note = oc * 12 + notes[int((position - oc) * l)]
         return note
 
     def create_tone_note(self, val):
@@ -78,7 +78,7 @@ class NoteGenerator(object):
         position = (self.max_note - self.min_note) * val + self.min_note
         position /= 12.0
         oc = int(position)
-        note = oc * 12 + notes[int((position-oc)*l)]
+        note = oc * 12 + notes[int((position - oc) * l)]
         return note
 
 

@@ -1,4 +1,3 @@
-
 from types import *
 
 
@@ -20,24 +19,25 @@ class Chord(object):
     "function is mode"
 
     def __init__(self, root, quality, func=None):
-        if type(root) == IntType:
+        if isinstance(root, IntType):
             self.root = root
         else:
             self.root = self.root_list.index(root)
 
-        if type(quality) == IntType:
+        if isinstance(quality, IntType):
             self.quality = quality
         else:
             self.quality = self.quality_list.index(quality)
 
-        if func != None:
+        if func is not None:
             self.function = func
         else:
             self.function = self.root
 
     def __str__(self):
         q = self.quality_list[self.quality]
-        return self.root_list[self.root] + q + " " + self.func_list[self.function] + q
+        return self.root_list[self.root] + q + \
+            " " + self.func_list[self.function] + q
 
     def __eq__(self, other):
         return self.root == other.root \

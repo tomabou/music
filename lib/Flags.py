@@ -1,4 +1,1 @@
-
 FINISH = False
-
-CHORD = None

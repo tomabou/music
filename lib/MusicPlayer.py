@@ -6,6 +6,7 @@ from lib.MusicData import SONGS, Chord
 import lib.Flags as Flags
 import math
 import lib.Flags as Flags
+import threading
 
 
 CHORD = Chord('D', 0)
@@ -17,8 +18,8 @@ SONG_NUM = 0
 def get_chord(song_num, song_ratio):
     song_list = SONGS[song_num]
     l = len(song_list)
-    index = int(song_ratio*l)
-    index = min(l-1, max(0, index))
+    index = int(song_ratio * l)
+    index = min(l - 1, max(0, index))
     return song_list[index]
 
 
@@ -31,7 +32,7 @@ def set_global_chord(song_num, song_ratio):
 
 
 def get_filepath(i):
-    return "./files/song"+str(i)+".wav"
+    return "./files/song" + str(i) + ".wav"
 
 
 def play_music():
@@ -56,7 +57,7 @@ def play_music():
         stream.write(data)  # blocking
         now_frame += CHUNK
         data = wfs[now_song].readframes(CHUNK)
-        song_ratio = now_frame/float(frame_lengths[now_song])
+        song_ratio = now_frame / float(frame_lengths[now_song])
 
         set_global_chord(now_song, song_ratio)
         if data == b'':
@@ -72,4 +73,13 @@ def play_music():
 
 
 if __name__ == '__main__':
-    play()
+    t = threading.Thread(target=play_music)
+    t.start()
+    try:
+        sys.stdin.readline()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        # Remove the sample listener when done
+        # all note off
+        Flags.FINISH = True
