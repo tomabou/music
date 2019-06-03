@@ -18,7 +18,7 @@ class Chord(object):
 
     "function is mode"
 
-    def __init__(self, root, quality, func=None):
+    def __init__(self, root, quality, func=None, ratio=0.5):
         if isinstance(root, IntType):
             self.root = root
         else:
@@ -34,6 +34,8 @@ class Chord(object):
         else:
             self.function = self.root
 
+        self.ratio = ratio
+
     def __str__(self):
         q = self.quality_list[self.quality]
         return self.root_list[self.root] + q + \
@@ -47,6 +49,8 @@ class Chord(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+
+small_ratio = 0.1
 
 SONGS = [[
     Chord('A', 'm'),
@@ -65,4 +69,14 @@ SONGS = [[
     Chord('G', '7'),
     Chord('C', ''),
     Chord('G', ''),
+],
+    [
+    Chord('C', '', ratio=small_ratio),
+    Chord('G', '', ratio=small_ratio),
+    Chord('A', 'm', ratio=small_ratio),
+    Chord('E', 'm', ratio=small_ratio),
+    Chord('F', '', ratio=small_ratio),
+    Chord('C', '', ratio=small_ratio),
+    Chord('F', '', ratio=small_ratio),
+    Chord('G', '7', ratio=small_ratio),
 ]]

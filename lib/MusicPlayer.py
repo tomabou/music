@@ -12,7 +12,7 @@ import threading
 CHORD = Chord('D', 0)
 CHUNK = 1024
 IS_RUN = True
-SONG_NUM = 0
+SONG_NUM = 1
 
 
 def get_chord(song_num, song_ratio):
@@ -28,7 +28,7 @@ def set_global_chord(song_num, song_ratio):
     global CHORD
     if CHORD != c:
         CHORD = c
-        print("set chord")
+        print("set chord {}".format(song_ratio))
 
 
 def get_filepath(i):
@@ -39,9 +39,9 @@ def play_music():
     wfs = []
     frame_lengths = []
     now_song = SONG_NUM
-    for i in range(1):
+    for i in range(2):
         wfs.append(wave.open(get_filepath(i), 'rb'))
-        frame_lengths.append(wfs[0].getnframes())
+        frame_lengths.append(wfs[i].getnframes())
 
     p = pyaudio.PyAudio()
 

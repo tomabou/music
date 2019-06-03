@@ -55,8 +55,8 @@ class NoteGenerator(object):
         notes.sort()
         return notes
 
-    def create_note_mix(self, val, latio):
-        if latio > random.random():
+    def create_note_mix(self, val, ratio):
+        if ratio > random.random():
             return self.create_available_note(val)
         else:
             return self.create_tone_note(val)

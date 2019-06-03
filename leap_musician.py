@@ -113,7 +113,7 @@ class SampleListener(Leap.Listener):
                 and y_speed <= -200:
 
             note_generator.set_chord(lib.MusicPlayer.CHORD)
-            note = note_generator.create_note_mix(x_pos, 0.5)
+            note = note_generator.create_note_mix(x_pos, lib.MusicPlayer.CHORD.ratio)
             self.send_note_midi(note, handType, velo)
 
         self.pre_y_speed[hand_id] = y_speed
