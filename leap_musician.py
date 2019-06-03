@@ -39,9 +39,13 @@ class SampleListener(Leap.Listener):
         print("Initialized")
         self.pre_y_speed = [0 for i in range(101)]
         self.pre_tip_y_speed = [0 for i in range(101)]
+        self.rotate_count = [0 for i in range(101)]
 
         self.pre_note = [None, None]
         self.note_lock = [0, 0]
+        self.channel = [0, 1]
+        self.old_channel = [0, 1]
+        self.channel_num = 4
 
     def on_connect(self, controller):
         print("Connected")
@@ -57,8 +61,9 @@ class SampleListener(Leap.Listener):
             return
         if self.pre_note[handType] is not None:
             midiout.send_message(
-                note_off(handType, self.pre_note[handType]))
-        midiout.send_message(note_on(handType, note_num, velo))
+                note_off(self.old_channel[handType], self.pre_note[handType]))
+        midiout.send_message(note_on(self.channel[handType], note_num, velo))
+        self.old_channel[handType] = self.channel[handType]
         self.note_lock[handType] = 3
         self.pre_note[handType] = note_num
         print("not:{} velo:{}".format(note_num, velo))
@@ -79,6 +84,17 @@ class SampleListener(Leap.Listener):
 
         self.pre_tip_y_speed[finger_id] = tip_y_speed
 
+    def is_rotete(self, hand, hand_id,handType):
+        y = hand.palm_normal[1]
+        if y > 0.8:
+            self.rotate_count[hand_id] += 1
+        elif self.rotate_count[hand_id] < 0:
+            self.rotate_count[hand_id] += 1
+        elif self.rotate_count[hand_id] > 15:
+            self.rotate_count[hand_id] = -120
+            old_chan = self.channel[handType]
+            self.channel[handType] = (old_chan+1)%self.channel_num
+
     def hand_func(self, hand):
         handType = 0 if hand.is_left else 1
 
@@ -86,6 +102,8 @@ class SampleListener(Leap.Listener):
         x_pos = (hand.palm_position[0] + 200.0) / 400.0
         velo = min(127, int(hand.palm_position[1] * 0.18))
         hand_id = hand.id % 100
+
+        self.is_rotete(hand, hand_id,handType)
 
         # avoid noise
         if self.note_lock[handType] > 0:
@@ -119,7 +137,7 @@ class SampleListener(Leap.Listener):
             if state:
                 if self.pre_note[i]:
                     midiout.send_message(
-                        note_off(i, self.pre_note[i]))
+                        note_off(self.old_channel[i], self.pre_note[i]))
                 self.pre_note[i] = None
 
 
