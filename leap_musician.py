@@ -9,6 +9,7 @@ from lib.NoteGenerator import NoteGenerator
 from lib.MusicPlayer import play_music
 import lib.MusicPlayer
 
+CHANNEL_NUM = 4
 
 midiout = rtmidi.MidiOut()
 available_ports = midiout.get_ports()
@@ -46,7 +47,7 @@ class MusicianListener(Leap.Listener):
         self.note_lock = [0, 0]
         self.channel = [1, 2]
         self.old_channel = [1, 2]
-        self.channel_num = 4
+        self.channel_num = CHANNEL_NUM
         self.grab_state = [False, False]
 
     def on_connect(self, controller):
