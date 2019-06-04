@@ -12,7 +12,8 @@ class NoteGenerator(object):
         [0, 3, 7, 10],
         [0, 4, 7, 11],
         [0, 3, 7, 11],
-        [0, 3, 6]
+        [0, 3, 6],
+        [0]
     ]
 
     def __init__(self, min_note, max_note):

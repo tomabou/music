@@ -10,6 +10,7 @@ class Chord(object):
         'M7',
         'mM7',
         'dim',
+        'e',
     ]
     root_list = ['C', 'C#', 'D', 'D#', 'E',
                  'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
@@ -87,7 +88,7 @@ SONGS = [[
     Chord('G', '7', ratio=0.0),
     Chord('G', '7', ratio=0.0),
     Chord('C', '', ratio=0.0),
-    Chord('C', '', ratio=0.0),
-    Chord('C', '', ratio=0.0),
-    Chord('C', '', ratio=0.0),
+    Chord('C', 'e', ratio=0.0),
+    Chord('C', 'e', ratio=0.0),
+    Chord('C', 'e', ratio=0.0),
 ]]
