@@ -50,7 +50,7 @@ class Chord(object):
         return not self.__eq__(other)
 
 
-small_ratio = 0.1
+small_ratio = 0.4
 
 SONGS = [[
     Chord('A', 'm'),
@@ -79,4 +79,15 @@ SONGS = [[
     Chord('C', '', ratio=small_ratio),
     Chord('F', '', ratio=small_ratio),
     Chord('G', '7', ratio=small_ratio),
+], [
+    Chord('A', 'm', ratio=0.0),
+    Chord('A', 'm', ratio=0.0),
+    Chord('F', '', ratio=0.0),
+    Chord('F', '', ratio=0.0),
+    Chord('G', '7', ratio=0.0),
+    Chord('G', '7', ratio=0.0),
+    Chord('C', '', ratio=0.0),
+    Chord('C', '', ratio=0.0),
+    Chord('C', '', ratio=0.0),
+    Chord('C', '', ratio=0.0),
 ]]

@@ -32,14 +32,18 @@ def set_global_chord(song_num, song_ratio):
 
 
 def get_filepath(i):
-    return "./files/song" + str(i) + ".wav"
+    if i < 2:
+        return "./files/song" + str(i) + ".wav"
+    else:
+        return "./files/end0.wav"
 
 
 def play_music():
+    global SONG_NUM
     wfs = []
     frame_lengths = []
     now_song = SONG_NUM
-    for i in range(2):
+    for i in range(3):
         wfs.append(wave.open(get_filepath(i), 'rb'))
         frame_lengths.append(wfs[i].getnframes())
 
@@ -49,10 +53,14 @@ def play_music():
                     channels=wfs[0].getnchannels(),
                     rate=wfs[0].getframerate(),
                     output=True)
+    print(now_song)
 
     data = wfs[now_song].readframes(CHUNK)
 
     now_frame = 0
+
+    Flags.start_event.wait()
+
     while not Flags.FINISH:
         stream.write(data)  # blocking
         now_frame += CHUNK
@@ -61,6 +69,13 @@ def play_music():
 
         set_global_chord(now_song, song_ratio)
         if data == b'':
+            Flags.END_AVAIL = True
+            if SONG_NUM == 2:
+                Flags.FINISH = True
+            if Flags.END:
+                SONG_NUM = 2
+            elif Flags.CHANGE_SONG:
+                SONG_NUM = (SONG_NUM + 1) % 2
             now_song = SONG_NUM
             wfs[now_song].rewind()
             now_frame = 0

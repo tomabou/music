@@ -40,12 +40,14 @@ class SampleListener(Leap.Listener):
         self.pre_y_speed = [0 for i in range(101)]
         self.pre_tip_y_speed = [0 for i in range(101)]
         self.rotate_count = [0 for i in range(101)]
+        self.grab_count = [0 for i in range(101)]
 
         self.pre_note = [None, None]
         self.note_lock = [0, 0]
-        self.channel = [0, 1]
-        self.old_channel = [0, 1]
+        self.channel = [1, 2]
+        self.old_channel = [1, 2]
         self.channel_num = 4
+        self.grab_state = [False, False]
 
     def on_connect(self, controller):
         print("Connected")
@@ -57,6 +59,8 @@ class SampleListener(Leap.Listener):
         print("Exited")
 
     def send_note_midi(self, note_num, handType, velo):
+        if (not Flags.START) or Flags.FINISH:
+            return
         if self.note_lock[handType] > 0:
             return
         if self.pre_note[handType] is not None:
@@ -84,7 +88,7 @@ class SampleListener(Leap.Listener):
 
         self.pre_tip_y_speed[finger_id] = tip_y_speed
 
-    def is_rotete(self, hand, hand_id,handType):
+    def is_rotete(self, hand, hand_id, handType):
         y = hand.palm_normal[1]
         if y > 0.8:
             self.rotate_count[hand_id] += 1
@@ -93,7 +97,25 @@ class SampleListener(Leap.Listener):
         elif self.rotate_count[hand_id] > 15:
             self.rotate_count[hand_id] = -120
             old_chan = self.channel[handType]
-            self.channel[handType] = (old_chan+1)%self.channel_num
+            self.channel[handType] = (old_chan + 1) % self.channel_num
+
+    def is_grab(self, hand, hand_id, handType):
+        grab = hand.grab_strength
+        if grab > 0.999:
+            Flags.CHANGE_SONG = True
+            self.grab_state[handType] = True
+        else:
+            Flags.CHANGE_SONG = False
+            self.grab_state[handType] = False
+
+        if self.grab_state[0] and self.grab_state[1]:
+            if not Flags.START:
+                Flags.START = True
+                Flags.start_event.set()
+            if Flags.END_AVAIL:
+                Flags.END = True
+        else:
+            Flags.END = False
 
     def hand_func(self, hand):
         handType = 0 if hand.is_left else 1
@@ -103,7 +125,8 @@ class SampleListener(Leap.Listener):
         velo = min(127, int(hand.palm_position[1] * 0.18))
         hand_id = hand.id % 100
 
-        self.is_rotete(hand, hand_id,handType)
+        self.is_rotete(hand, hand_id, handType)
+        self.is_grab(hand, hand_id, handType)
 
         # avoid noise
         if self.note_lock[handType] > 0:
@@ -113,7 +136,8 @@ class SampleListener(Leap.Listener):
                 and y_speed <= -200:
 
             note_generator.set_chord(lib.MusicPlayer.CHORD)
-            note = note_generator.create_note_mix(x_pos, lib.MusicPlayer.CHORD.ratio)
+            note = note_generator.create_note_mix(
+                x_pos, lib.MusicPlayer.CHORD.ratio)
             self.send_note_midi(note, handType, velo)
 
         self.pre_y_speed[hand_id] = y_speed
@@ -139,6 +163,7 @@ class SampleListener(Leap.Listener):
                     midiout.send_message(
                         note_off(self.old_channel[i], self.pre_note[i]))
                 self.pre_note[i] = None
+                self.grab_state[i] = False
 
 
 def main():
@@ -164,6 +189,7 @@ def main():
         midiout.send_message([0xB0, 123, 0])
         # Remove the sample listener when done
         controller.remove_listener(listener)
+        Flags.start_event.set()
 
 
 def test_midi():
