@@ -33,7 +33,7 @@ def playnote(note):
     midiout.send_message(note_off(0, note))
 
 
-class SampleListener(Leap.Listener):
+class MusicianListener(Leap.Listener):
 
     def on_init(self, controller):
         print("Initialized")
@@ -128,7 +128,7 @@ class SampleListener(Leap.Listener):
         self.is_rotete(hand, hand_id, handType)
         self.is_grab(hand, hand_id, handType)
 
-        # avoid noise
+        # avoid chattering
         if self.note_lock[handType] > 0:
             self.note_lock[handType] -= 1
 
@@ -149,7 +149,6 @@ class SampleListener(Leap.Listener):
         return handType
 
     def on_frame(self, controller):
-        # Get the most recent frame and report some basic information
         frame = controller.frame()
 
         isDead = [True, True]
@@ -167,12 +166,9 @@ class SampleListener(Leap.Listener):
 
 
 def main():
-    playnote(60)
-
-    listener = SampleListener()
+    listener = MusicianListener()
     controller = Leap.Controller()
 
-    # Have the sample listener receive events from the controller
     controller.add_listener(listener)
 
     t1 = threading.Thread(target=play_music)
@@ -186,10 +182,9 @@ def main():
     finally:
         # all note off
         Flags.FINISH = True
-        midiout.send_message([0xB0, 123, 0])
-        # Remove the sample listener when done
-        controller.remove_listener(listener)
         Flags.start_event.set()
+        midiout.send_message([0xB0, 123, 0])
+        controller.remove_listener(listener)
 
 
 def test_midi():

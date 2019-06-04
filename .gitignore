@@ -1,3 +1,6 @@
 *.wav
 .vscode
 *.pyc
+!files/song0.wav
+!files/end0.wav
+!files/song1.wav
