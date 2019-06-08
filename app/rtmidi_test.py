@@ -3,10 +3,10 @@ import rtmidi
 
 midiout = rtmidi.MidiOut()
 available_ports = midiout.get_ports()
-print available_ports
+print(available_ports)
 
 if available_ports:
-    midiout.open_port(2)
+    midiout.open_port(3)
 else:
     midiout.open_virtual_port("My virtual output")
 

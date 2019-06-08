@@ -103,11 +103,15 @@ class MusicianListener(Leap.Listener):
     def is_grab(self, hand, hand_id, handType):
         grab = hand.grab_strength
         if grab > 0.999:
-            Flags.CHANGE_SONG = True
             self.grab_state[handType] = True
         else:
-            Flags.CHANGE_SONG = False
             self.grab_state[handType] = False
+
+        if self.grab_state[0] or self.grab_state[1]:
+            Flags.CHANGE_SONG = True
+        else:
+            Flags.CHANGE_SONG = False
+
 
         if self.grab_state[0] and self.grab_state[1]:
             if not Flags.START:
@@ -137,8 +141,9 @@ class MusicianListener(Leap.Listener):
                 and y_speed <= -200:
 
             note_generator.set_chord(lib.MusicPlayer.CHORD)
+            ratio = lib.MusicPlayer.CHORD.ratio if handType == 1 else 0.0
             note = note_generator.create_note_mix(
-                x_pos, lib.MusicPlayer.CHORD.ratio)
+                x_pos, ratio)
             self.send_note_midi(note, handType, velo)
 
         self.pre_y_speed[hand_id] = y_speed
